@@ -1,0 +1,438 @@
+diff --git a/pom.xml b/pom.xml
+index 0b64a14..e34e738 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -1,21 +1,24 @@
++<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+ <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+     <modelVersion>4.0.0</modelVersion>
+ 
+     <parent>
+-        <groupId>org.jenkins-ci.plugins</groupId>
+-        <artifactId>plugin</artifactId>
+-        <version>1.398</version>
+-    </parent>
++        <groupId>org.eclipse.hudson.plugins</groupId>
++        <artifactId>hudson-plugin-parent</artifactId>
++        <version>3.0.0</version>
++    <relativePath/>
++  </parent>
+ 
+-    <artifactId>crowd2</artifactId>
+-    <version>1.5</version>
++    <groupId>org.hudsonci.plugins</groupId>
++  <artifactId>crowd2</artifactId>
++    <version>1.5-h-1-SNAPSHOT</version>
+ 
+     <packaging>hpi</packaging>
+ 
+     <name>Crowd 2 Integration</name>
+     <description>SecurityRealm that enables the use of Atlassian's Crowd identity management server.</description>
+ 
+-    <url>http://wiki.jenkins-ci.org/display/JENKINS/Crowd+2+Plugin</url>
++    <url>http://wiki.hudson-ci.org/display/HUDSON/Crowd+2+Plugin</url>
+     <issueManagement>
+         <system>JIRA</system>
+         <url>https://issues.jenkins-ci.org/</url>
+@@ -39,9 +42,9 @@
+ 
+ 
+     <scm>
+-        <connection>scm:git:git://github.com/jenkinsci/crowd2-plugin.git</connection>
+-        <developerConnection>scm:git:https://github.com/jenkinsci/crowd2-plugin.git</developerConnection>
+-        <url>https://github.com/jenkinsci/crowd2-plugin</url>
++        <connection>scm:git:git://github.com/hudson3-plugins/crowd2.git</connection>
++        <developerConnection>scm:git:git@github.com:hudson3-plugins/crowd2.git</developerConnection>
++        <url>https://github.com/hudson3-plugins/crowd2</url>
+       <tag>crowd2-1.5</tag>
+   </scm>
+ 
+@@ -51,16 +54,7 @@
+             <id>atlassian</id>
+             <url>https://m2proxy.atlassian.com/repository/public</url>
+         </repository>
+-        <repository>
+-            <id>repo.jenkins-ci.org</id>
+-            <url>http://repo.jenkins-ci.org/public/</url>
+-            <releases>
+-                <enabled>true</enabled>
+-            </releases>
+-            <snapshots>
+-                <enabled>false</enabled>
+-            </snapshots>
+-        </repository>
++        
+     </repositories>
+ 
+     <pluginRepositories>
+@@ -83,7 +77,7 @@
+             <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-compiler-plugin</artifactId>
+-                <version>2.5.1</version>
++                <version>3.0</version>
+                 <configuration>
+                     <source>1.6</source>
+                     <target>1.6</target>
+@@ -105,4 +99,14 @@
+             <version>1.5</version>
+         </dependency>
+     </dependencies>
++<licenses>
++    <license>
++      <name>The MIT license</name>
++      <url>http://opensource.org/licenses/MIT</url>
++      <distribution>repo</distribution>
++    </license>
++  </licenses>
++  <properties>
++    <hudsonTags>user</hudsonTags>
++  </properties>
+ </project>
+diff --git a/src/main/java/de/theit/jenkins/crowd/CrowdAuthenticationManager.java b/src/main/java/de/theit/jenkins/crowd/CrowdAuthenticationManager.java
+index 43bec1a..0fb1cb4 100644
+--- a/src/main/java/de/theit/jenkins/crowd/CrowdAuthenticationManager.java
++++ b/src/main/java/de/theit/jenkins/crowd/CrowdAuthenticationManager.java
+@@ -39,15 +39,15 @@ import java.util.List;
+ import java.util.logging.Level;
+ import java.util.logging.Logger;
+ 
+-import org.acegisecurity.AccountExpiredException;
+-import org.acegisecurity.Authentication;
+-import org.acegisecurity.AuthenticationException;
+-import org.acegisecurity.AuthenticationManager;
+-import org.acegisecurity.AuthenticationServiceException;
+-import org.acegisecurity.BadCredentialsException;
+-import org.acegisecurity.CredentialsExpiredException;
+-import org.acegisecurity.GrantedAuthority;
+-import org.acegisecurity.InsufficientAuthenticationException;
++import org.springframework.security.AccountExpiredException;
++import org.springframework.security.Authentication;
++import org.springframework.security.AuthenticationException;
++import org.springframework.security.AuthenticationManager;
++import org.springframework.security.AuthenticationServiceException;
++import org.springframework.security.BadCredentialsException;
++import org.springframework.security.CredentialsExpiredException;
++import org.springframework.security.GrantedAuthority;
++import org.springframework.security.InsufficientAuthenticationException;
+ 
+ import com.atlassian.crowd.exception.ApplicationPermissionException;
+ import com.atlassian.crowd.exception.ExpiredCredentialException;
+@@ -58,7 +58,7 @@ import com.atlassian.crowd.exception.UserNotFoundException;
+ import com.atlassian.crowd.model.user.User;
+ 
+ /**
+- * This class implements the authentication manager for Jenkins.
++ * This class implements the authentication manager for Hudson.
+  * 
+  * @author <a href="mailto:theit@gmx.de">Thorsten Heit (theit@gmx.de)</a>
+  * @since 07.09.2011
+@@ -89,7 +89,7 @@ public class CrowdAuthenticationManager implements AuthenticationManager {
+ 	/**
+ 	 * {@inheritDoc}
+ 	 * 
+-	 * @see org.acegisecurity.AuthenticationManager#authenticate(org.acegisecurity.Authentication)
++	 * @see org.springframework.security.AuthenticationManager#authenticate(org.springframework.security.Authentication)
+ 	 */
+ 	@Override
+ 	public Authentication authenticate(Authentication authentication)
+diff --git a/src/main/java/de/theit/jenkins/crowd/CrowdAuthenticationToken.java b/src/main/java/de/theit/jenkins/crowd/CrowdAuthenticationToken.java
+index e18f0fa..2aea71f 100644
+--- a/src/main/java/de/theit/jenkins/crowd/CrowdAuthenticationToken.java
++++ b/src/main/java/de/theit/jenkins/crowd/CrowdAuthenticationToken.java
+@@ -27,8 +27,8 @@ package de.theit.jenkins.crowd;
+ 
+ import java.util.List;
+ 
+-import org.acegisecurity.GrantedAuthority;
+-import org.acegisecurity.providers.AbstractAuthenticationToken;
++import org.springframework.security.GrantedAuthority;
++import org.springframework.security.providers.AbstractAuthenticationToken;
+ 
+ /**
+  * This class represents an authentication token that is created after a user
+@@ -85,7 +85,7 @@ public class CrowdAuthenticationToken extends AbstractAuthenticationToken {
+ 	/**
+ 	 * {@inheritDoc}
+ 	 * 
+-	 * @see org.acegisecurity.Authentication#getCredentials()
++	 * @see org.springframework.security.Authentication#getCredentials()
+ 	 */
+ 	@Override
+ 	public String getCredentials() {
+@@ -95,7 +95,7 @@ public class CrowdAuthenticationToken extends AbstractAuthenticationToken {
+ 	/**
+ 	 * {@inheritDoc}
+ 	 * 
+-	 * @see org.acegisecurity.Authentication#getPrincipal()
++	 * @see org.springframework.security.Authentication#getPrincipal()
+ 	 */
+ 	@Override
+ 	public String getPrincipal() {
+@@ -115,7 +115,7 @@ public class CrowdAuthenticationToken extends AbstractAuthenticationToken {
+ 	/**
+ 	 * {@inheritDoc}
+ 	 * 
+-	 * @see org.acegisecurity.providers.AbstractAuthenticationToken#getName()
++	 * @see org.springframework.security.providers.AbstractAuthenticationToken#getName()
+ 	 */
+ 	@Override
+ 	public String getName() {
+diff --git a/src/main/java/de/theit/jenkins/crowd/CrowdConfigurationService.java b/src/main/java/de/theit/jenkins/crowd/CrowdConfigurationService.java
+index 9fc940b..69d1574 100644
+--- a/src/main/java/de/theit/jenkins/crowd/CrowdConfigurationService.java
++++ b/src/main/java/de/theit/jenkins/crowd/CrowdConfigurationService.java
+@@ -41,8 +41,8 @@ import java.util.TreeSet;
+ import java.util.logging.Level;
+ import java.util.logging.Logger;
+ 
+-import org.acegisecurity.GrantedAuthority;
+-import org.acegisecurity.GrantedAuthorityImpl;
++import org.springframework.security.GrantedAuthority;
++import org.springframework.security.GrantedAuthorityImpl;
+ 
+ import com.atlassian.crowd.exception.ApplicationPermissionException;
+ import com.atlassian.crowd.exception.GroupNotFoundException;
+diff --git a/src/main/java/de/theit/jenkins/crowd/CrowdMailAddressResolverImpl.java b/src/main/java/de/theit/jenkins/crowd/CrowdMailAddressResolverImpl.java
+index 6985d19..cf88e4a 100644
+--- a/src/main/java/de/theit/jenkins/crowd/CrowdMailAddressResolverImpl.java
++++ b/src/main/java/de/theit/jenkins/crowd/CrowdMailAddressResolverImpl.java
+@@ -34,7 +34,7 @@ import hudson.tasks.MailAddressResolver;
+ import java.util.logging.Level;
+ import java.util.logging.Logger;
+ 
+-import org.acegisecurity.userdetails.UsernameNotFoundException;
++import org.springframework.security.userdetails.UsernameNotFoundException;
+ import org.springframework.dao.DataAccessException;
+ 
+ /**
+diff --git a/src/main/java/de/theit/jenkins/crowd/CrowdRememberMeServices.java b/src/main/java/de/theit/jenkins/crowd/CrowdRememberMeServices.java
+index e74bb7b..f302c32 100644
+--- a/src/main/java/de/theit/jenkins/crowd/CrowdRememberMeServices.java
++++ b/src/main/java/de/theit/jenkins/crowd/CrowdRememberMeServices.java
+@@ -41,9 +41,9 @@ import java.util.logging.Logger;
+ import javax.servlet.http.HttpServletRequest;
+ import javax.servlet.http.HttpServletResponse;
+ 
+-import org.acegisecurity.Authentication;
+-import org.acegisecurity.GrantedAuthority;
+-import org.acegisecurity.ui.rememberme.RememberMeServices;
++import org.springframework.security.Authentication;
++import org.springframework.security.GrantedAuthority;
++import org.springframework.security.ui.rememberme.RememberMeServices;
+ 
+ import com.atlassian.crowd.exception.ApplicationAccessDeniedException;
+ import com.atlassian.crowd.exception.ApplicationPermissionException;
+@@ -87,7 +87,7 @@ public class CrowdRememberMeServices implements RememberMeServices {
+ 	/**
+ 	 * {@inheritDoc}
+ 	 * 
+-	 * @see org.acegisecurity.ui.rememberme.RememberMeServices#autoLogin(javax.servlet.http.HttpServletRequest,
++	 * @see org.springframework.security.ui.rememberme.RememberMeServices#autoLogin(javax.servlet.http.HttpServletRequest,
+ 	 *      javax.servlet.http.HttpServletResponse)
+ 	 */
+ 	@Override
+@@ -156,7 +156,7 @@ public class CrowdRememberMeServices implements RememberMeServices {
+ 	/**
+ 	 * {@inheritDoc}
+ 	 * 
+-	 * @see org.acegisecurity.ui.rememberme.RememberMeServices#loginFail(javax.servlet.http.HttpServletRequest,
++	 * @see org.springframework.security.ui.rememberme.RememberMeServices#loginFail(javax.servlet.http.HttpServletRequest,
+ 	 *      javax.servlet.http.HttpServletResponse)
+ 	 */
+ 	@Override
+@@ -179,9 +179,9 @@ public class CrowdRememberMeServices implements RememberMeServices {
+ 	/**
+ 	 * {@inheritDoc}
+ 	 * 
+-	 * @see org.acegisecurity.ui.rememberme.RememberMeServices#loginSuccess(javax.servlet.http.HttpServletRequest,
++	 * @see org.springframework.security.ui.rememberme.RememberMeServices#loginSuccess(javax.servlet.http.HttpServletRequest,
+ 	 *      javax.servlet.http.HttpServletResponse,
+-	 *      org.acegisecurity.Authentication)
++	 *      org.springframework.security.Authentication)
+ 	 */
+ 	@Override
+ 	public void loginSuccess(HttpServletRequest request,
+diff --git a/src/main/java/de/theit/jenkins/crowd/CrowdSecurityRealm.java b/src/main/java/de/theit/jenkins/crowd/CrowdSecurityRealm.java
+index f574169..cbd9e74 100644
+--- a/src/main/java/de/theit/jenkins/crowd/CrowdSecurityRealm.java
++++ b/src/main/java/de/theit/jenkins/crowd/CrowdSecurityRealm.java
+@@ -58,16 +58,16 @@ import javax.servlet.Filter;
+ import javax.servlet.FilterConfig;
+ import javax.servlet.ServletException;
+ 
+-import org.acegisecurity.AccountExpiredException;
+-import org.acegisecurity.AuthenticationException;
+-import org.acegisecurity.AuthenticationManager;
+-import org.acegisecurity.AuthenticationServiceException;
+-import org.acegisecurity.BadCredentialsException;
+-import org.acegisecurity.GrantedAuthority;
+-import org.acegisecurity.InsufficientAuthenticationException;
+-import org.acegisecurity.userdetails.UserDetails;
+-import org.acegisecurity.userdetails.UserDetailsService;
+-import org.acegisecurity.userdetails.UsernameNotFoundException;
++import org.springframework.security.AccountExpiredException;
++import org.springframework.security.AuthenticationException;
++import org.springframework.security.AuthenticationManager;
++import org.springframework.security.AuthenticationServiceException;
++import org.springframework.security.BadCredentialsException;
++import org.springframework.security.GrantedAuthority;
++import org.springframework.security.InsufficientAuthenticationException;
++import org.springframework.security.userdetails.UserDetails;
++import org.springframework.security.userdetails.UserDetailsService;
++import org.springframework.security.userdetails.UsernameNotFoundException;
+ import org.kohsuke.stapler.DataBoundConstructor;
+ import org.kohsuke.stapler.QueryParameter;
+ import org.kohsuke.stapler.StaplerRequest;
+@@ -260,7 +260,7 @@ public class CrowdSecurityRealm extends AbstractPasswordBasedSecurityRealm {
+ 	 * @see hudson.security.SecurityRealm#createFilter(javax.servlet.FilterConfig)
+ 	 */
+ 	@Override
+-	public Filter createFilter(FilterConfig filterConfig) {
++	public Filter createFilter(FilterConfig filterConfig) throws ServletException {
+ 		if (null == this.configuration) {
+ 			initializeConfiguration();
+ 		}
+diff --git a/src/main/java/de/theit/jenkins/crowd/CrowdServletFilter.java b/src/main/java/de/theit/jenkins/crowd/CrowdServletFilter.java
+index d643982..bdc90ab 100644
+--- a/src/main/java/de/theit/jenkins/crowd/CrowdServletFilter.java
++++ b/src/main/java/de/theit/jenkins/crowd/CrowdServletFilter.java
+@@ -26,7 +26,7 @@
+ package de.theit.jenkins.crowd;
+ 
+ import static de.theit.jenkins.crowd.ErrorMessages.operationFailed;
+-import static org.acegisecurity.ui.rememberme.TokenBasedRememberMeServices.ACEGI_SECURITY_HASHED_REMEMBER_ME_COOKIE_KEY;
++import static org.springframework.security.ui.rememberme.TokenBasedRememberMeServices.SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY;
+ 
+ import java.io.IOException;
+ import java.util.logging.Level;
+@@ -43,10 +43,10 @@ import javax.servlet.http.HttpServletRequest;
+ import javax.servlet.http.HttpServletResponse;
+ import javax.servlet.http.HttpSession;
+ 
+-import org.acegisecurity.Authentication;
+-import org.acegisecurity.context.SecurityContext;
+-import org.acegisecurity.context.SecurityContextHolder;
+-import org.acegisecurity.ui.rememberme.RememberMeServices;
++import org.springframework.security.Authentication;
++import org.springframework.security.context.SecurityContext;
++import org.springframework.security.context.SecurityContextHolder;
++import org.springframework.security.ui.rememberme.RememberMeServices;
+ 
+ import com.atlassian.crowd.exception.OperationFailedException;
+ 
+@@ -164,7 +164,7 @@ public class CrowdServletFilter implements Filter {
+ 
+ 				// reset remember-me cookie
+ 				Cookie cookie = new Cookie(
+-						ACEGI_SECURITY_HASHED_REMEMBER_ME_COOKIE_KEY, "");
++						SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY, "");
+ 				cookie.setPath(req.getContextPath().length() > 0 ? req
+ 						.getContextPath() : "/");
+ 				res.addCookie(cookie);
+diff --git a/src/main/java/de/theit/jenkins/crowd/CrowdUser.java b/src/main/java/de/theit/jenkins/crowd/CrowdUser.java
+index fcfaab0..4f25a70 100644
+--- a/src/main/java/de/theit/jenkins/crowd/CrowdUser.java
++++ b/src/main/java/de/theit/jenkins/crowd/CrowdUser.java
+@@ -27,8 +27,8 @@ package de.theit.jenkins.crowd;
+ 
+ import java.util.List;
+ 
+-import org.acegisecurity.GrantedAuthority;
+-import org.acegisecurity.userdetails.UserDetails;
++import org.springframework.security.GrantedAuthority;
++import org.springframework.security.userdetails.UserDetails;
+ 
+ import com.atlassian.crowd.model.user.User;
+ 
+@@ -67,7 +67,7 @@ public class CrowdUser implements UserDetails {
+ 	/**
+ 	 * {@inheritDoc}
+ 	 * 
+-	 * @see org.acegisecurity.userdetails.UserDetails#getAuthorities()
++	 * @see org.springframework.security.userdetails.UserDetails#getAuthorities()
+ 	 */
+ 	@Override
+ 	public GrantedAuthority[] getAuthorities() {
+@@ -78,7 +78,7 @@ public class CrowdUser implements UserDetails {
+ 	/**
+ 	 * {@inheritDoc}
+ 	 * 
+-	 * @see org.acegisecurity.userdetails.UserDetails#getPassword()
++	 * @see org.springframework.security.userdetails.UserDetails#getPassword()
+ 	 */
+ 	@Override
+ 	public String getPassword() {
+@@ -88,7 +88,7 @@ public class CrowdUser implements UserDetails {
+ 	/**
+ 	 * {@inheritDoc}
+ 	 * 
+-	 * @see org.acegisecurity.userdetails.UserDetails#getUsername()
++	 * @see org.springframework.security.userdetails.UserDetails#getUsername()
+ 	 */
+ 	@Override
+ 	public String getUsername() {
+@@ -98,7 +98,7 @@ public class CrowdUser implements UserDetails {
+ 	/**
+ 	 * {@inheritDoc}
+ 	 * 
+-	 * @see org.acegisecurity.userdetails.UserDetails#isAccountNonExpired()
++	 * @see org.springframework.security.userdetails.UserDetails#isAccountNonExpired()
+ 	 */
+ 	@Override
+ 	public boolean isAccountNonExpired() {
+@@ -108,7 +108,7 @@ public class CrowdUser implements UserDetails {
+ 	/**
+ 	 * {@inheritDoc}
+ 	 * 
+-	 * @see org.acegisecurity.userdetails.UserDetails#isAccountNonLocked()
++	 * @see org.springframework.security.userdetails.UserDetails#isAccountNonLocked()
+ 	 */
+ 	@Override
+ 	public boolean isAccountNonLocked() {
+@@ -118,7 +118,7 @@ public class CrowdUser implements UserDetails {
+ 	/**
+ 	 * {@inheritDoc}
+ 	 * 
+-	 * @see org.acegisecurity.userdetails.UserDetails#isCredentialsNonExpired()
++	 * @see org.springframework.security.userdetails.UserDetails#isCredentialsNonExpired()
+ 	 */
+ 	@Override
+ 	public boolean isCredentialsNonExpired() {
+@@ -128,7 +128,7 @@ public class CrowdUser implements UserDetails {
+ 	/**
+ 	 * {@inheritDoc}
+ 	 * 
+-	 * @see org.acegisecurity.userdetails.UserDetails#isEnabled()
++	 * @see org.springframework.security.userdetails.UserDetails#isEnabled()
+ 	 */
+ 	@Override
+ 	public boolean isEnabled() {
+diff --git a/src/main/java/de/theit/jenkins/crowd/CrowdUserDetailsService.java b/src/main/java/de/theit/jenkins/crowd/CrowdUserDetailsService.java
+index 055bb6a..ff95f25 100644
+--- a/src/main/java/de/theit/jenkins/crowd/CrowdUserDetailsService.java
++++ b/src/main/java/de/theit/jenkins/crowd/CrowdUserDetailsService.java
+@@ -37,10 +37,10 @@ import java.util.List;
+ import java.util.logging.Level;
+ import java.util.logging.Logger;
+ 
+-import org.acegisecurity.GrantedAuthority;
+-import org.acegisecurity.userdetails.UserDetails;
+-import org.acegisecurity.userdetails.UserDetailsService;
+-import org.acegisecurity.userdetails.UsernameNotFoundException;
++import org.springframework.security.GrantedAuthority;
++import org.springframework.security.userdetails.UserDetails;
++import org.springframework.security.userdetails.UserDetailsService;
++import org.springframework.security.userdetails.UsernameNotFoundException;
+ import org.springframework.dao.DataAccessException;
+ import org.springframework.dao.DataRetrievalFailureException;
+ 
+@@ -83,7 +83,7 @@ public class CrowdUserDetailsService implements UserDetailsService {
+ 	/**
+ 	 * {@inheritDoc}
+ 	 * 
+-	 * @see org.acegisecurity.userdetails.UserDetailsService#loadUserByUsername(java.lang.String)
++	 * @see org.springframework.security.userdetails.UserDetailsService#loadUserByUsername(java.lang.String)
+ 	 */
+ 	@Override
+ 	public UserDetails loadUserByUsername(String username)
