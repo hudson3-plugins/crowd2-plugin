@@ -52,7 +52,7 @@ public class CrowdAuthenticationToken extends AbstractAuthenticationToken {
 	private String ssoToken;
 
 	/** The display name of the user. */
-	private String displayName;
+	// private String displayName;
 
 	/**
 	 * Creates a new authorization token.
@@ -79,7 +79,7 @@ public class CrowdAuthenticationToken extends AbstractAuthenticationToken {
 		this.principal = pPrincipal;
 		this.credentials = pCredentials;
 		this.ssoToken = pSsoToken;
-		this.displayName = pDisplayName;
+		// this.displayName = pDisplayName;
 	}
 
 	/**
@@ -117,6 +117,13 @@ public class CrowdAuthenticationToken extends AbstractAuthenticationToken {
 	 * 
 	 * @see org.springframework.security.providers.AbstractAuthenticationToken#getName()
 	 */
+	
+	/**
+	 
+	 This breaks authentication for the new Hudson 3.1.0 Team-based Authorization.
+	 This could be made configurable, but not necessary for my purposes.
+	 
+	 
 	@Override
 	public String getName() {
 		if (null == this.displayName) {
@@ -125,4 +132,6 @@ public class CrowdAuthenticationToken extends AbstractAuthenticationToken {
 		// append the user Id stored in getName() at the end of the display name
 		return this.displayName + " (" + super.getName() + ')';
 	}
+	
+	*/
 }
