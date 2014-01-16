@@ -6,11 +6,11 @@
         <groupId>org.eclipse.hudson.plugins</groupId>
         <artifactId>hudson-plugin-parent</artifactId>
         <version>3.0.0</version>
-    <relativePath />
-  </parent>
+        <relativePath />
+    </parent>
 
     <groupId>org.hudsonci.plugins</groupId>
-  <artifactId>crowd2</artifactId>
+    <artifactId>crowd2</artifactId>
     <version>1.5-h-2-SNAPSHOT</version>
 
     <packaging>hpi</packaging>
@@ -45,8 +45,8 @@
         <connection>scm:git:git://github.com/hudson3-plugins/crowd2.git</connection>
         <developerConnection>scm:git:git@github.com:hudson3-plugins/crowd2.git</developerConnection>
         <url>https://github.com/hudson3-plugins/crowd2</url>
-      <tag>crowd2-1.5</tag>
-  </scm>
+        <tag>1.5-h-2</tag>
+    </scm>
 
 
     <repositories>
@@ -69,6 +69,11 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.eclipse.hudson.tools</groupId>
+                <artifactId>maven-hpi-plugin</artifactId>
+                <version>3.0.2</version>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.3.2</version>
@@ -85,7 +90,7 @@
             </plugin>
         </plugins>
     </build>
-
+    
     <dependencies>
         <dependency>
             <groupId>com.atlassian.crowd</groupId>
@@ -99,14 +104,14 @@
             <version>1.5</version>
         </dependency>
     </dependencies>
-<licenses>
-    <license>
-      <name>The MIT license</name>
-      <url>http://opensource.org/licenses/MIT</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-  <properties>
-    <hudsonTags>user</hudsonTags>
-  </properties>
+    <licenses>
+        <license>
+            <name>The MIT license</name>
+            <url>http://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <properties>
+        <hudsonTags>user</hudsonTags>
+    </properties>
 </project>
