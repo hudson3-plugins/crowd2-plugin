@@ -26,9 +26,9 @@
 package de.theit.jenkins.crowd;
 
 import java.util.List;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 
-import org.springframework.security.GrantedAuthority;
-import org.springframework.security.providers.AbstractAuthenticationToken;
 
 /**
  * This class represents an authentication token that is created after a user
@@ -75,7 +75,7 @@ public class CrowdAuthenticationToken extends AbstractAuthenticationToken {
 	public CrowdAuthenticationToken(String pPrincipal, String pCredentials,
 			List<GrantedAuthority> authorities, String pSsoToken,
 			String pDisplayName) {
-		super(authorities.toArray(new GrantedAuthority[authorities.size()]));
+		super(authorities);
 		this.principal = pPrincipal;
 		this.credentials = pCredentials;
 		this.ssoToken = pSsoToken;

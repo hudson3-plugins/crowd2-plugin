@@ -33,9 +33,9 @@ import hudson.tasks.MailAddressResolver;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.springframework.security.userdetails.UsernameNotFoundException;
 import org.springframework.dao.DataAccessException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
 
 /**
  * This class resolves email addresses via lookup in Crowd.

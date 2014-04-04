@@ -26,7 +26,6 @@
 package de.theit.jenkins.crowd;
 
 import static de.theit.jenkins.crowd.ErrorMessages.operationFailed;
-import static org.springframework.security.ui.rememberme.TokenBasedRememberMeServices.SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -43,12 +42,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.springframework.security.Authentication;
-import org.springframework.security.context.SecurityContext;
-import org.springframework.security.context.SecurityContextHolder;
-import org.springframework.security.ui.rememberme.RememberMeServices;
-
 import com.atlassian.crowd.exception.OperationFailedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.RememberMeServices;
+import static org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices.SPRING_SECURITY_REMEMBER_ME_COOKIE_KEY;
 
 /**
  * This class realizes a servlet filter that checks on each request the status

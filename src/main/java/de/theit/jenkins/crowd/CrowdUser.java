@@ -27,10 +27,10 @@ package de.theit.jenkins.crowd;
 
 import java.util.List;
 
-import org.springframework.security.GrantedAuthority;
-import org.springframework.security.userdetails.UserDetails;
-
 import com.atlassian.crowd.model.user.User;
+import java.util.Collection;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * This class provides the information about a user that was authenticated
@@ -69,11 +69,11 @@ public class CrowdUser implements UserDetails {
 	 * 
 	 * @see org.springframework.security.userdetails.UserDetails#getAuthorities()
 	 */
-	@Override
-	public GrantedAuthority[] getAuthorities() {
-		return this.grantedAuthorities
-				.toArray(new GrantedAuthority[this.grantedAuthorities.size()]);
-	}
+	
+        @Override
+        public Collection<? extends GrantedAuthority> getAuthorities() {
+            return this.grantedAuthorities;
+        }
 
 	/**
 	 * {@inheritDoc}
