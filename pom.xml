@@ -11,7 +11,7 @@
 
     <groupId>org.hudsonci.plugins</groupId>
     <artifactId>crowd2</artifactId>
-    <version>1.5-h-3-SNAPSHOT</version>
+    <version>1.5-h-4-SNAPSHOT</version>
 
     <packaging>hpi</packaging>
 
